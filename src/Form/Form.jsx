@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 
-const DropdownForm = () => {
+const Form = () => {
   // Maps for each dropdown with arbitrary values
   const dropdownMaps = {
     Category: {
@@ -173,6 +173,7 @@ const DropdownForm = () => {
   });
 
   const [result, setResult] = useState("");
+  const [error, setError] = useState("");
 
   // Handle form change
   const handleChange = (e) => {
@@ -183,19 +184,70 @@ const DropdownForm = () => {
     });
   };
 
-  // Function to format values according to the rules provided
-  const formatValue = (value) => {
+  // Function to format T and t values
+  const formatTValue = (value) => {
     if (value && !isNaN(value)) {
-      const quotient = Math.floor(value).toString().padStart(2, "0");
-      return quotient.slice(0, 2);
+      const numericValue = parseFloat(value);
+
+      // Check if the value is out of range
+      if (numericValue < 7 || numericValue > 33) {
+        setError("Please enter values between 7 and 33 for T and t.");
+        return null;
+      } else {
+        setError(""); // Clear any previous errors
+
+        // If the value is less than 10, return multiplied by 10 (e.g., 8 becomes 80)
+        if (numericValue < 10) {
+          return (numericValue * 10).toFixed(0);
+        } else {
+          // If the value is greater than or equal to 10, check if it's an integer or decimal
+          if (Number.isInteger(numericValue)) {
+            return numericValue.toString(); // Return the integer part as it is (e.g., 13 remains 13)
+          } else {
+            return numericValue.toString().replace(".", ""); // Return without the decimal point (e.g., 11.5 becomes 115)
+          }
+        }
+      }
     } else {
-      return "00";
+      return "00"; // Default value if input is invalid
+    }
+  };
+
+  // Function to format L value
+  const formatLValue = (value) => {
+    if (value && !isNaN(value)) {
+      const numericValue = parseFloat(value);
+
+      if (numericValue < 100) {
+        // If value is less than 100, divide by 10 and format as Yx
+        const quotient = Math.floor(numericValue / 10);
+        return `Y${quotient}`;
+      } else if (numericValue >= 100 && numericValue < 1000) {
+        // If value is between 100 and 999, divide by 100 and add a zero
+        const quotient = Math.floor(numericValue / 100);
+        return `${quotient}0`;
+      } else if (numericValue >= 1000) {
+        // If value is 1000 or more, divide by 100 and return the two-digit result
+        return Math.floor(numericValue / 100).toString();
+      }
+    } else {
+      return "00"; // Default value if input is invalid
     }
   };
 
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const TValue = formatTValue(formValues.input1); // T
+    const tValue = formatTValue(formValues.input2); // t
+
+    if (TValue === null || tValue === null) {
+      setError("Please enter values between 7 and 33 for T and t.");
+      return; // Stop form submission if values are out of range
+    }
+
+    setError(""); // Clear error if values are valid
 
     let resultString = "";
 
@@ -214,12 +266,7 @@ const DropdownForm = () => {
       resultString += selectedDropdownValue;
     });
 
-    // Process input values with custom logic
-    const TValue = formatValue(formValues.input1 / 10); // T divided by 10
-    const tValue = formatValue(formValues.input2 / 10); // t divided by 10
-    const LValue = formatValue(formValues.input3 / 100); // L divided by 100
-
-    // Concatenate input values
+    const LValue = formatLValue(formValues.input3); // Process L value
     resultString += `${TValue}${tValue}${LValue}`;
 
     // Append Suffix dropdown
@@ -246,6 +293,9 @@ const DropdownForm = () => {
       </motion.h1>
 
       <form onSubmit={handleSubmit} className="space-y-8">
+        {/* Error Message */}
+        {error && <div className="text-red-600 text-center mb-4">{error}</div>}
+
         {/* Dropdowns in a grid layout (3 per row) */}
         <motion.div
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
@@ -321,10 +371,13 @@ const DropdownForm = () => {
             </label>
             <input
               type="number"
+              step="0.1"
               name="input1"
               value={formValues.input1}
               onChange={handleChange}
               className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-transform transform group-hover:scale-105"
+              min={7} // Minimum value set to 7
+              max={33} // Maximum value set to 33
             />
           </motion.div>
           <motion.div
@@ -342,10 +395,13 @@ const DropdownForm = () => {
             </label>
             <input
               type="number"
+              step="0.1"
               name="input2"
               value={formValues.input2}
               onChange={handleChange}
               className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-transform transform group-hover:scale-105"
+              min={7} // Minimum value set to 7
+              max={33} // Maximum value set to 33
             />
           </motion.div>
           <motion.div
@@ -363,6 +419,7 @@ const DropdownForm = () => {
             </label>
             <input
               type="number"
+              step="0.1"
               name="input3"
               value={formValues.input3}
               onChange={handleChange}
@@ -402,4 +459,4 @@ const DropdownForm = () => {
   );
 };
 
-export default DropdownForm;
+export default Form;

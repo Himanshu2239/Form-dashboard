@@ -4,6 +4,7 @@ import viteLogo from "/vite.svg";
 import Form from "./Form/Form";
 import "./App.css";
 import Header from "./Components/Header/Header";
+import PipeForm from "./Components/Pipes/PipeForm/PipeForm";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -11,7 +12,8 @@ function App() {
   return (
     <>
       <Header />
-      <Form />
+      {/* <Form /> */}
+      <PipeForm />
     </>
   );
 }
