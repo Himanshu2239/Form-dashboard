@@ -5,18 +5,29 @@ const PipeForm = () => {
   // Dropdown options as arrays of objects
   const dropdownMaps = {
     Flanged: {
-      DF: "DF",
-      SF: "SF",
-    },
+      DOUBLE_FLANGED: "DF",
+      SINGLE_FLANGED: "SF",
+      DOUBLE_SPIGOT: "DS",
+      SOCKET_SPIGOT:"SG",
+      SINGLE_FLENGED_SOCKET:"FS"
+    }, 
     Joint: {
       SCREWED: "S",
       WELDED: "W",
     },
     Puddle: {
-      PUDDLE: "1",
-      NOPUDDLE: "0",
+      0: "0",
+      1: "1",
+      2: "2",
+      3: "3",
+      4: "4",
+      5: "6",
+      6: "7",
+      7: "8",
+      8: "9",
+     
     },
-    DIAmm: {
+    DIA_in_mm: {
       80: "Y8",
       100: "01",
       125: "12",
@@ -40,13 +51,14 @@ const PipeForm = () => {
       1500: "15",
       1600: "16",
     },
-    PN: {
-      "PN-10": "A",
-      "PN-16": "B",
-      "PN-25": "C",
-      "PN-40": "D",
-      "PN-63": "E",
-      "PN-100": "F",
+    PN_Value: {
+      "PN_Value-10": "A",
+      "PN_Value-16": "B",
+      "PN_Value-10/16":"C",
+      "PN_Value-25": "D",
+      "PN_Value-40": "E",
+      "PN_Value-63": "F",
+      "PN_Value-100": "G",
     },
   };
 
@@ -55,10 +67,10 @@ const PipeForm = () => {
     Flanged: "",
     Joint: "",
     Puddle: "",
-    DIAmm: "",
-    PN: "",
-    Length: "",
-    Pressure: "",
+    DIA_in_mm: "",
+    PN_Value: "",
+    Lengh_in_mm: "",
+    Suffix: "",
   });
 
   const [result, setResult] = useState("");
@@ -73,7 +85,7 @@ const PipeForm = () => {
     });
   };
 
-  // Function to process numeric values for Length and Pressure
+  // Function to process numeric values for Lengh_in_mm
   const processNumericValue = (value) => {
     if (value && !isNaN(value)) {
       const numericValue = parseFloat(value) / 100;
@@ -97,9 +109,11 @@ const PipeForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Process Length and Pressure inputs
-    const lengthValue = processNumericValue(formValues.Length);
-    const pressureValue = processNumericValue(formValues.Pressure);
+    // Process Lengh_in_mm input
+    const Lengh_in_mmValue = processNumericValue(formValues.Lengh_in_mm);
+    
+    // Process the suffix to only take the first 2 characters
+    const suffixValue = formValues.Suffix.substring(0, 2).toUpperCase();
 
     // Check if all fields are filled
     const isFormValid = Object.keys(formValues).every((key) => formValues[key]);
@@ -116,10 +130,10 @@ const PipeForm = () => {
       dropdownMaps.Flanged[formValues.Flanged],
       dropdownMaps.Joint[formValues.Joint],
       dropdownMaps.Puddle[formValues.Puddle],
-      dropdownMaps.DIAmm[formValues.DIAmm],
-      lengthValue,
-      dropdownMaps.PN[formValues.PN],
-      pressureValue,
+      dropdownMaps.DIA_in_mm[formValues.DIA_in_mm],
+      Lengh_in_mmValue,
+      dropdownMaps.PN_Value[formValues.PN_Value],
+      suffixValue,
     ].join("");
 
     setResult(resultString);
@@ -138,7 +152,7 @@ const PipeForm = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
       >
-        Product Code For DIDF
+        Product Code For DFID
       </motion.h1>
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -191,7 +205,7 @@ const PipeForm = () => {
           ))}
         </motion.div>
 
-        {/* Numeric Inputs for Length and Pressure */}
+        {/* Numeric Input for Lengh_in_mm */}
         <motion.div
           className="grid grid-cols-1 sm:grid-cols-2 gap-8"
           initial="hidden"
@@ -213,20 +227,22 @@ const PipeForm = () => {
             className="relative group"
           >
             <label
-              htmlFor="Length"
+              htmlFor="Lengh_in_mm"
               className="block text-base font-medium text-gray-800 mb-2 group-hover:text-indigo-600 transition-colors"
             >
-              Length (Number):
+              Lengh_in_mm (Number):
             </label>
             <input
               type="number"
               step="0.1"
-              name="Length"
-              value={formValues.Length}
+              name="Lengh_in_mm"
+              value={formValues.Lengh_in_mm}
               onChange={handleChange}
               className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-transform transform group-hover:scale-105"
             />
           </motion.div>
+
+          {/* Suffix Input */}
           <motion.div
             variants={{
               hidden: { opacity: 0, y: 20 },
@@ -235,16 +251,15 @@ const PipeForm = () => {
             className="relative group"
           >
             <label
-              htmlFor="Pressure"
+              htmlFor="Suffix"
               className="block text-base font-medium text-gray-800 mb-2 group-hover:text-indigo-600 transition-colors"
             >
-              Pressure (Number):
+              Suffix (Either Number or Alphabet):
             </label>
             <input
-              type="number"
-              step="0.1"
-              name="Pressure"
-              value={formValues.Pressure}
+              type="text"
+              name="Suffix"
+              value={formValues.Suffix}
               onChange={handleChange}
               className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-transform transform group-hover:scale-105"
             />
