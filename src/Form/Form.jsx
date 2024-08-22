@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { HiOutlineRefresh } from "react-icons/hi";
 
 const Form = () => {
   // Maps for each dropdown with arbitrary values
@@ -17,7 +18,7 @@ const Form = () => {
       "Flanged Branch Tee": "FB",
       "Flanged Pipe": "FP",
       Gland: "GL",
-      "Invert Flanged Branc": "IF",
+      "Invert Flanged Branch": "IF",
       Plug: "PL",
       "Puddle Pipe": "PP",
       "Reducer (Taper)": "RT",
@@ -94,7 +95,7 @@ const Form = () => {
       "PN-25": "3",
       "PN-40": "4",
     },
-    DN: {
+    "Major Part Dia(mm)": {
       80: "Y8",
       100: "01",
       125: "12",
@@ -118,7 +119,7 @@ const Form = () => {
       1500: "15",
       1600: "16",
     },
-    dn: {
+    "Branch Dia(mm)": {
       80: "Y8",
       100: "01",
       125: "12",
@@ -143,20 +144,23 @@ const Form = () => {
       1600: "16",
       NA: "00",
     },
+    Puddle: {
+      0: "0",
+      1: "1",
+      2: "2",
+      3: "3",
+      4: "4",
+      5: "6",
+      6: "7",
+      7: "8",
+      8: "9",
+    },
     Angle: {
       11.25: "W",
       22.5: "X",
       45: "Y",
       90: "Z",
-      NA: "O"
-    },
-    Suffix: {
-      "INVERT TEE": "IT",
-      "JOINT WELD": "JW",
-      CROSS: "XO",
-      REDUCER: "RD",
-      BEND: "BN",
-      "FOOT BEND": "FB",
+      NA: "O",
     },
   };
 
@@ -166,12 +170,11 @@ const Form = () => {
     Type: "",
     Quality: "",
     Pressure: "",
-    DN: "",
-    dn: "",
+    "Major Part Dia(mm)": "",
+    "Branch Dia(mm)": "",
+    Puddle: "",
     Angle: "",
     Suffix: "",
-    input1: "", // T
-    input2: "", // t
     input3: "", // L/100
   });
 
@@ -187,51 +190,26 @@ const Form = () => {
     });
   };
 
-  // Function to format T and t values
-  const formatTValue = (value) => {
-    if (value && !isNaN(value)) {
-      const numericValue = parseFloat(value);
-
-      // Check if the value is out of range
-      if (numericValue < 7 || numericValue > 33) {
-        setError("Please enter values between 7 and 33 for T and t.");
-        return null;
-      } else {
-        setError(""); // Clear any previous errors
-
-        // If the value is less than 10, return multiplied by 10 (e.g., 8 becomes 80)
-        if (numericValue < 10) {
-          return (numericValue * 10).toFixed(0);
-        } else {
-          // If the value is greater than or equal to 10, check if it's an integer or decimal
-          if (Number.isInteger(numericValue)) {
-            return numericValue.toString(); // Return the integer part as it is (e.g., 13 remains 13)
-          } else {
-            return numericValue.toString().replace(".", ""); // Return without the decimal point (e.g., 11.5 becomes 115)
-          }
-        }
-      }
-    } else {
-      return "00"; // Default value if input is invalid
-    }
-  };
-
-  // Function to format L value
   const formatLValue = (value) => {
     if (value && !isNaN(value)) {
       const numericValue = parseFloat(value);
 
+      // Formatting logic for values less than 100
       if (numericValue < 100) {
-        // If value is less than 100, divide by 10 and format as Yx
-        const quotient = Math.floor(numericValue / 10);
-        return `Y${quotient}`;
-      } else if (numericValue >= 100 && numericValue < 1000) {
-        // If value is between 100 and 999, divide by 100 and add a zero
-        const quotient = Math.floor(numericValue / 100);
-        return `${quotient}0`;
-      } else if (numericValue >= 1000) {
-        // If value is 1000 or more, divide by 100 and return the two-digit result
-        return Math.floor(numericValue / 100).toString();
+        const scaledValue = Math.floor(numericValue / 10); // convert 0.7 to 70
+        return `Y${scaledValue}`;
+      }
+
+      // Formatting logic for values between 100 and 900
+      if (numericValue >= 100 && numericValue <= 900) {
+        const hundredsDigit = Math.floor(numericValue / 100); // convert 100 to 1, 200 to 2, etc.
+        return `0${hundredsDigit}`;
+      }
+
+      // Formatting logic for values above 1000
+      if (numericValue >= 1000) {
+        const thousandsDigit = Math.floor(numericValue / 100); // convert 1100 to 11, 1200 to 12, etc.
+        return `${thousandsDigit}`;
       }
     } else {
       return "00"; // Default value if input is invalid
@@ -241,14 +219,6 @@ const Form = () => {
   // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    const TValue = formatTValue(formValues.input1); // T
-    const tValue = formatTValue(formValues.input2); // t
-
-    if (TValue === null || tValue === null) {
-      setError("Please enter values between 7 and 33 for T and t.");
-      return; // Stop form submission if values are out of range
-    }
 
     setError(""); // Clear error if values are valid
 
@@ -260,8 +230,9 @@ const Form = () => {
       "Type",
       "Quality",
       "Pressure",
-      "DN",
-      "dn",
+      "Major Part Dia(mm)",
+      "Branch Dia(mm)",
+      "Puddle",
       "Angle",
     ];
     dropdownKeys.forEach((key) => {
@@ -270,13 +241,30 @@ const Form = () => {
     });
 
     const LValue = formatLValue(formValues.input3); // Process L value
-    resultString += `${TValue}${tValue}${LValue}`;
+    resultString += LValue;
 
-    // Append Suffix dropdown
-    const selectedSuffix = dropdownMaps.Suffix[formValues.Suffix] || "00"; // Default to "00"
-    resultString += selectedSuffix;
+    // Append Suffix input (only first 3 characters)
+    const suffixValue = formValues.Suffix.substring(0, 3).toUpperCase() || "00"; // Default to "00"
+    resultString += suffixValue;
 
     setResult(resultString);
+  };
+
+  const handleReset = (e) => {
+    e.preventDefault();
+    // Resetting all form values
+    setFormValues({
+      Category: "",
+      Type: "",
+      Quality: "",
+      Pressure: "",
+      "Major Part Dia(mm)": "",
+      "Branch Dia(mm)": "",
+      Puddle: "",
+      Angle: "",
+      Suffix: "",
+      input3: "", // L/100
+    });
   };
 
   return (
@@ -292,7 +280,7 @@ const Form = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
       >
-        PRODUCT CODE FOR DI FITTINGS 
+        PRODUCT CODE FOR DI FITTINGS
       </motion.h1>
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -345,7 +333,7 @@ const Form = () => {
           ))}
         </motion.div>
 
-        {/* Numeric Inputs */}
+        {/* Numeric Input for L */}
         <motion.div
           className="grid grid-cols-1 sm:grid-cols-3 gap-8"
           initial="hidden"
@@ -367,58 +355,10 @@ const Form = () => {
             className="relative group"
           >
             <label
-              htmlFor="input1"
-              className="block text-base font-medium text-gray-800 mb-2 group-hover:text-indigo-600 transition-colors"
-            >
-              T (Number):
-            </label>
-            <input
-              type="number"
-              step="0.1"
-              name="input1"
-              value={formValues.input1}
-              onChange={handleChange}
-              className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-transform transform group-hover:scale-105"
-              min={7} // Minimum value set to 7
-              max={33} // Maximum value set to 33
-            />
-          </motion.div>
-          <motion.div
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0 },
-            }}
-            className="relative group"
-          >
-            <label
-              htmlFor="input2"
-              className="block text-base font-medium text-gray-800 mb-2 group-hover:text-indigo-600 transition-colors"
-            >
-              t (Number):
-            </label>
-            <input
-              type="number"
-              step="0.1"
-              name="input2"
-              value={formValues.input2}
-              onChange={handleChange}
-              className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-transform transform group-hover:scale-105"
-              min={7} // Minimum value set to 7
-              max={33} // Maximum value set to 33
-            />
-          </motion.div>
-          <motion.div
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0 },
-            }}
-            className="relative group"
-          >
-            <label
               htmlFor="input3"
               className="block text-base font-medium text-gray-800 mb-2 group-hover:text-indigo-600 transition-colors"
             >
-              L (Number):
+              Lengh_in_mm (Number):
             </label>
             <input
               type="number"
@@ -429,19 +369,54 @@ const Form = () => {
               className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-transform transform group-hover:scale-105"
             />
           </motion.div>
+
+          {/* Suffix Input */}
+          <motion.div
+            variants={{
+              hidden: { opacity: 0, y: 20 },
+              visible: { opacity: 1, y: 0 },
+            }}
+            className="relative group"
+          >
+            <label
+              htmlFor="Suffix"
+              className="block text-base font-medium text-gray-800 mb-2 group-hover:text-indigo-600 transition-colors"
+            >
+              Suffix (Text):
+            </label>
+            <input
+              type="text"
+              name="Suffix"
+              value={formValues.Suffix}
+              onChange={handleChange}
+              className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-transform transform group-hover:scale-105"
+            />
+          </motion.div>
         </motion.div>
 
         {/* Submit Button */}
-        <motion.div className="text-center">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            type="submit"
-            className="inline-block w-full sm:w-auto bg-indigo-600 text-white py-3 px-6 rounded-lg shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-transform transform hover:scale-105"
-          >
-            Submit
-          </motion.button>
-        </motion.div>
+        <div className="flex flex-row gap-4 justify-center">
+          <motion.div className="text-center">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              type="submit"
+              className="inline-block w-full sm:w-auto bg-indigo-600 text-white py-3 px-6 rounded-lg shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-transform transform hover:scale-105"
+            >
+              Submit
+            </motion.button>
+          </motion.div>
+          <motion.div className="text-center" onClick={handleReset}>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              type="submit"
+              className="inline-block w-full sm:w-auto bg-indigo-600 text-white py-3 px-6 rounded-lg shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-transform transform hover:scale-105"
+            >
+              Reset
+            </motion.button>
+          </motion.div>
+        </div>
       </form>
 
       {/* Result Display */}
