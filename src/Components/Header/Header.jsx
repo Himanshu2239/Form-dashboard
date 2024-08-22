@@ -9,8 +9,8 @@ export default function Header() {
 
   // Array of navigation items
   const navItems = [
-    { label: "Steel", navigateTo: "/" },
-    { label: "Pipes", navigateTo: "/pipes" },
+    { label: "Fittings", navigateTo: "/" },
+    { label: "DIDF", navigateTo: "/pipes" },
   ];
 
   // Function to check if the current item is active

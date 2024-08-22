@@ -92,6 +92,7 @@ const Form = () => {
       "PN-10": "1",
       "PN-16": "2",
       "PN-25": "3",
+      "PN-40": "4",
     },
     DN: {
       80: "Y8",
@@ -140,12 +141,14 @@ const Form = () => {
       1400: "14",
       1500: "15",
       1600: "16",
+      NA: "00",
     },
     Angle: {
       11.25: "W",
       22.5: "X",
       45: "Y",
       90: "Z",
+      NA: "O"
     },
     Suffix: {
       "INVERT TEE": "IT",
@@ -289,7 +292,7 @@ const Form = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
       >
-        Customize Your Configuration
+        PRODUCT CODE FOR DI FITTINGS 
       </motion.h1>
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -449,7 +452,7 @@ const Form = () => {
         transition={{ duration: 0.5, delay: 0.4 }}
       >
         <h2 className="text-2xl font-semibold text-indigo-700 mb-4">
-          Selected Values
+          SKU CODE
         </h2>
         <pre className="text-lg text-gray-800 whitespace-pre-wrap">
           {result}

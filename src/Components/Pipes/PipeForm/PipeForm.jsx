@@ -76,14 +76,17 @@ const PipeForm = () => {
   // Function to process numeric values for Length and Pressure
   const processNumericValue = (value) => {
     if (value && !isNaN(value)) {
-      const numericValue = parseFloat(value);
-
-      if (numericValue < 100) {
-        return `Y${Math.floor(numericValue / 10)}`;
-      } else if (numericValue >= 100 && numericValue < 1000) {
-        return `${Math.floor(numericValue / 100)}0`;
+      const numericValue = parseFloat(value) / 100;
+      
+      // Formatting logic
+      if (numericValue < 1) {
+        const scaledValue = Math.floor(numericValue * 100); // convert 0.7 to 70
+        return `Y${scaledValue}`;
+      } else if (numericValue >= 1 && numericValue < 10) {
+        const scaledValue = Math.floor(numericValue * 10); // convert 7 to 70
+        return `${Math.floor(numericValue)}Y${scaledValue % 10}`;
       } else {
-        return Math.floor(numericValue / 100).toString();
+        return `${Math.floor(numericValue)}Y`; // convert 70 to 70Y
       }
     } else {
       return "00"; // Default value if input is invalid
@@ -135,7 +138,7 @@ const PipeForm = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
       >
-        Customize Your Configuration
+        Product Code For DIDF
       </motion.h1>
 
       <form onSubmit={handleSubmit} className="space-y-8">
@@ -270,7 +273,7 @@ const PipeForm = () => {
           transition={{ duration: 0.5, delay: 0.4 }}
         >
           <h2 className="text-2xl font-semibold text-indigo-700 mb-4">
-            Generated Barcode
+            SKU CODE
           </h2>
           <pre className="text-lg text-gray-800 whitespace-pre-wrap">
             {result}
