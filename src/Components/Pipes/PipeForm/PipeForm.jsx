@@ -28,7 +28,6 @@ const PipeForm = () => {
       9: "9",
     },
     Necks: {
-      // Necks dropdown options
       SHORT_NECKS: "SN",
       LONG_NECK: "LN",
       NO_NECK: "00",
@@ -73,10 +72,9 @@ const PipeForm = () => {
     Flanged: "",
     Joint: "",
     Puddle: "",
-    Necks: "", // Necks state
+    Necks: "",
     DIA_in_mm: "",
     PN_Value: "",
-    pressure: "", // Pressure field
     Lengh_in_mm: "",
     Suffix: "",
   });
@@ -100,19 +98,19 @@ const PipeForm = () => {
 
       // Formatting logic for values less than 100
       if (numericValue < 100) {
-        const scaledValue = Math.floor(numericValue / 10); // convert 0.7 to 70
+        const scaledValue = Math.floor(numericValue / 10);
         return `Y${scaledValue}`;
       }
 
       // Formatting logic for values between 100 and 900
       if (numericValue >= 100 && numericValue <= 900) {
-        const hundredsDigit = Math.floor(numericValue / 100); // convert 100 to 1, 200 to 2, etc.
+        const hundredsDigit = Math.floor(numericValue / 100);
         return `0${hundredsDigit}`;
       }
 
       // Formatting logic for values above 1000
       if (numericValue >= 1000) {
-        const thousandsDigit = Math.floor(numericValue / 100); // convert 1100 to 11, 1200 to 12, etc.
+        const thousandsDigit = Math.floor(numericValue / 100);
         return `${thousandsDigit}`;
       }
     } else {
@@ -128,24 +126,18 @@ const PipeForm = () => {
     const Lengh_in_mmValue = processNumericValue(formValues.Lengh_in_mm);
 
     // Process the suffix to only take the first 3 characters
-    const suffixValue = formValues.Suffix.substring(0, 3).toUpperCase() || "00"; // Default to "00" if empty
-
-    // Add pressure value directly to barcode (use default "00" if empty)
-
-    //Pressure :
-    const pressureValue = processNumericValue(formValues.pressure);
+    const suffixValue = formValues.Suffix.substring(0, 3).toUpperCase() || "00";
 
     // Generate the barcode string in the specified order, defaulting to "00" if no value is selected
     const resultString = [
-      dropdownMaps.Flanged[formValues.Flanged] || "00", // Default to "00"
-      dropdownMaps.Joint[formValues.Joint] || "00", // Default to "00"
-      dropdownMaps.Puddle[formValues.Puddle] || "00", // Default to "00"
-      dropdownMaps.Necks[formValues.Necks] || "00", // Default to "00"
-      dropdownMaps.DIA_in_mm[formValues.DIA_in_mm] || "00", // Default to "00"
-      pressureValue, // Add the pressure value before the length
-      Lengh_in_mmValue || "00", // Default to "00"
-      dropdownMaps.PN_Value[formValues.PN_Value] || "00", // Default to "00"
-      suffixValue, // Processed suffix value
+      dropdownMaps.Flanged[formValues.Flanged] || "00",
+      dropdownMaps.Joint[formValues.Joint] || "00",
+      dropdownMaps.Puddle[formValues.Puddle] || "00",
+      dropdownMaps.Necks[formValues.Necks] || "00",
+      dropdownMaps.DIA_in_mm[formValues.DIA_in_mm] || "00",
+      Lengh_in_mmValue || "00",
+      dropdownMaps.PN_Value[formValues.PN_Value] || "00",
+      suffixValue,
     ].join("");
 
     setResult(resultString);
@@ -153,15 +145,13 @@ const PipeForm = () => {
 
   const handleReset = (e) => {
     e.preventDefault();
-    // Resetting all form values
     setFormValues({
       Flanged: "",
       Joint: "",
       Puddle: "",
-      Necks: "", // Reset Necks
+      Necks: "",
       DIA_in_mm: "",
       PN_Value: "",
-      pressure: "", // Reset pressure field
       Lengh_in_mm: "",
       Suffix: "",
     });
@@ -184,10 +174,8 @@ const PipeForm = () => {
       </motion.h1>
 
       <form onSubmit={handleSubmit} className="space-y-8">
-        {/* Error Message */}
         {error && <div className="text-red-600 text-center mb-4">{error}</div>}
 
-        {/* Dropdowns in a grid layout (3 per row) */}
         <motion.div
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
           initial="hidden"
@@ -233,7 +221,6 @@ const PipeForm = () => {
           ))}
         </motion.div>
 
-        {/* Numeric Input for Pressure and Lengh_in_mm */}
         <motion.div
           className="grid grid-cols-1 sm:grid-cols-2 gap-8"
           initial="hidden"
@@ -247,29 +234,6 @@ const PipeForm = () => {
             },
           }}
         >
-          <motion.div
-            variants={{
-              hidden: { opacity: 0, y: 20 },
-              visible: { opacity: 1, y: 0 },
-            }}
-            className="relative group"
-          >
-            <label
-              htmlFor="pressure"
-              className="block text-base font-medium text-gray-800 mb-2 group-hover:text-indigo-600 transition-colors"
-            >
-              Pressure (Number):
-            </label>
-            <input
-              type="number"
-              step="0.1"
-              name="pressure"
-              value={formValues.pressure}
-              onChange={handleChange}
-              className="mt-1 block w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-transform transform group-hover:scale-105"
-            />
-          </motion.div>
-
           <motion.div
             variants={{
               hidden: { opacity: 0, y: 20 },
@@ -293,7 +257,6 @@ const PipeForm = () => {
             />
           </motion.div>
 
-          {/* Suffix Input */}
           <motion.div
             variants={{
               hidden: { opacity: 0, y: 20 },
@@ -317,7 +280,6 @@ const PipeForm = () => {
           </motion.div>
         </motion.div>
 
-        {/* Submit Button */}
         <div className="flex flex-row gap-4 justify-center items-center">
           <motion.div className="text-center">
             <motion.button
@@ -342,7 +304,6 @@ const PipeForm = () => {
         </div>
       </form>
 
-      {/* Result Display */}
       {result && (
         <motion.div
           className="mt-10 p-6 bg-indigo-50 border border-indigo-200 rounded-lg shadow-lg"
