@@ -9,8 +9,7 @@ const PipeForm = () => {
       SINGLE_FLANGED: "SF",
       DOUBLE_SPIGOT: "DS",
       SOCKET_SPIGOT: "SG",
-      SINGLE_FLENGED_SOCKET: "FS",
-      NO_FLANGED: "00", // No Flanged option
+      FLENGED_SOCKET: "FS",
     },
     Joint: {
       SCREWED: "S",
