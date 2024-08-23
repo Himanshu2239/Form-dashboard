@@ -382,7 +382,7 @@ const Form = () => {
               htmlFor="Suffix"
               className="block text-base font-medium text-gray-800 mb-2 group-hover:text-indigo-600 transition-colors"
             >
-              Suffix (Text):
+              Suffix (Text and Numbers):
             </label>
             <input
               type="text"
