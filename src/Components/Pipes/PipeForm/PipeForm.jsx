@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 
 const PipeForm = () => {
-  // Dropdown options as arrays of objects
   const dropdownMaps = {
     Flanged: {
       DOUBLE_FLANGED: "DF",
@@ -67,7 +66,6 @@ const PipeForm = () => {
     },
   };
 
-  // State to manage form values
   const [formValues, setFormValues] = useState({
     Flanged: "",
     Joint: "",
@@ -95,26 +93,12 @@ const PipeForm = () => {
   const processNumericValue = (value) => {
     if (value && !isNaN(value)) {
       const numericValue = parseFloat(value);
+      const quotient = Math.floor(numericValue / 25);
 
-      // Formatting logic for values less than 100
-      if (numericValue < 100) {
-        const scaledValue = Math.floor(numericValue / 10);
-        return `Y${scaledValue}`;
-      }
-
-      // Formatting logic for values between 100 and 900
-      if (numericValue >= 100 && numericValue <= 900) {
-        const hundredsDigit = Math.floor(numericValue / 100);
-        return `0${hundredsDigit}`;
-      }
-
-      // Formatting logic for values above 1000
-      if (numericValue >= 1000) {
-        const thousandsDigit = Math.floor(numericValue / 100);
-        return `${thousandsDigit}`;
-      }
+      // Ensure the result is a 3-digit string, padded with zeros if necessary
+      return quotient.toString().padStart(3, "0");
     } else {
-      return "00"; // Default value if input is invalid
+      return "000"; // Default value if input is invalid
     }
   };
 
@@ -125,8 +109,8 @@ const PipeForm = () => {
     // Process Lengh_in_mm input
     const Lengh_in_mmValue = processNumericValue(formValues.Lengh_in_mm);
 
-    // Process the suffix to only take the first 3 characters
-    const suffixValue = formValues.Suffix.substring(0, 3).toUpperCase() || "00";
+    // Process the suffix to only take the first 2 characters
+    const suffixValue = formValues.Suffix.substring(0, 2).toUpperCase() || "00";
 
     // Generate the barcode string in the specified order, defaulting to "00" if no value is selected
     const resultString = [
@@ -135,7 +119,7 @@ const PipeForm = () => {
       dropdownMaps.Puddle[formValues.Puddle] || "00",
       dropdownMaps.Necks[formValues.Necks] || "00",
       dropdownMaps.DIA_in_mm[formValues.DIA_in_mm] || "00",
-      Lengh_in_mmValue || "00",
+      Lengh_in_mmValue || "000", // Using the updated 3-digit length format
       dropdownMaps.PN_Value[formValues.PN_Value] || "00",
       suffixValue,
     ].join("");
