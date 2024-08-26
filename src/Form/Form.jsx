@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { HiOutlineRefresh } from "react-icons/hi";
 
 const Form = () => {
-  // Maps for each dropdown with arbitrary values
   const dropdownMaps = {
     Category: {
       Accessories: "AC",
@@ -25,8 +24,8 @@ const Form = () => {
       Socket: "SC",
       Spigot: "SG",
       Tee: "TE",
-      "socket branch Tee" : "SB",
-      "Inv Socket Branch" : "IS"
+      "socket branch Tee": "SB",
+      "Inv Socket Branch": "IS"
     },
     Type: {
       "ADAPTOR BODY (DJ)": "APB",
@@ -86,8 +85,7 @@ const Form = () => {
       "WELDABLE FLANGE SN": "WFS",
       "DOUBLE FLANGED INV TEE": "DFI",
       "DF SKT BRANCH TEE": "DST"
-}
-,
+    },
     Quality: {
       K7: "A",
       K9: "B",
@@ -97,7 +95,7 @@ const Form = () => {
     Pressure: {
       "PN-10": "1",
       "PN-16": "2",
-      "PN-10/16":"3",
+      "PN-10/16": "3",
       "PN-25": "4",
       "PN-40": "5",
     },
@@ -171,7 +169,6 @@ const Form = () => {
     },
   };
 
-  // State to manage form values
   const [formValues, setFormValues] = useState({
     Category: "",
     Type: "",
@@ -182,13 +179,12 @@ const Form = () => {
     Puddle: "",
     Angle: "",
     Suffix: "",
-    input3: "", // L/100
+    input3: "", // Length in mm
   });
 
   const [result, setResult] = useState("");
   const [error, setError] = useState("");
 
-  // Handle form change
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormValues({
@@ -199,31 +195,12 @@ const Form = () => {
 
   const formatLValue = (value) => {
     if (value && !isNaN(value)) {
-      const numericValue = parseFloat(value);
-
-      // Formatting logic for values less than 100
-      if (numericValue < 100) {
-        const scaledValue = Math.floor(numericValue / 10); // convert 0.7 to 70
-        return `Y${scaledValue}`;
-      }
-
-      // Formatting logic for values between 100 and 900
-      if (numericValue >= 100 && numericValue <= 900) {
-        const hundredsDigit = Math.floor(numericValue / 100); // convert 100 to 1, 200 to 2, etc.
-        return `0${hundredsDigit}`;
-      }
-
-      // Formatting logic for values above 1000
-      if (numericValue >= 1000) {
-        const thousandsDigit = Math.floor(numericValue / 100); // convert 1100 to 11, 1200 to 12, etc.
-        return `${thousandsDigit}`;
-      }
-    } else {
-      return "00"; // Default value if input is invalid
+      const numericValue = Math.floor(parseFloat(value) / 10);
+      return numericValue.toString().padStart(3, "0"); // Always 3 digits
     }
+    return "000"; // Default value if input is invalid
   };
 
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -231,27 +208,28 @@ const Form = () => {
 
     let resultString = "";
 
-    // Process each dropdown value based on new dropdown names
     const dropdownKeys = [
       "Category",
-      "Type",
-      "Quality",
-      "Pressure",
+      "Type",     // Updated to default to "000"
+      "Quality",  // Updated to default to "0"
+      "Pressure", // Updated to default to "0"
       "Major Part Dia(mm)",
       "Branch Dia(mm)",
-      "Puddle",
-      "Angle",
+      "Puddle",   // Updated to default to "0"
+      "Angle",    // Updated to default to "0"
     ];
+
     dropdownKeys.forEach((key) => {
-      const selectedDropdownValue = dropdownMaps[key][formValues[key]] || "00"; // Default to "00"
+      // Default for "Quality", "Pressure", "Puddle", and "Angle" is "0", "Type" is "000"
+      const defaultSingleZeroKeys = ["Quality", "Pressure", "Puddle", "Angle"];
+      const selectedDropdownValue = dropdownMaps[key][formValues[key]] || (key === "Type" ? "000" : (defaultSingleZeroKeys.includes(key) ? "0" : "00"));
       resultString += selectedDropdownValue;
     });
 
     const LValue = formatLValue(formValues.input3); // Process L value
     resultString += LValue;
 
-    // Append Suffix input (only first 3 characters)
-    const suffixValue = formValues.Suffix.substring(0, 3).toUpperCase() || "00"; // Default to "00"
+    const suffixValue = formValues.Suffix.substring(0, 3).padStart(3, "0").toUpperCase() || "000"; // Default to "000"
     resultString += suffixValue;
 
     setResult(resultString);
@@ -259,7 +237,6 @@ const Form = () => {
 
   const handleReset = (e) => {
     e.preventDefault();
-    // Resetting all form values
     setFormValues({
       Category: "",
       Type: "",
@@ -270,7 +247,7 @@ const Form = () => {
       Puddle: "",
       Angle: "",
       Suffix: "",
-      input3: "", // L/100
+      input3: "", // Length in mm
     });
   };
 
@@ -291,10 +268,8 @@ const Form = () => {
       </motion.h1>
 
       <form onSubmit={handleSubmit} className="space-y-8">
-        {/* Error Message */}
         {error && <div className="text-red-600 text-center mb-4">{error}</div>}
 
-        {/* Dropdowns in a grid layout (3 per row) */}
         <motion.div
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"
           initial="hidden"
@@ -340,7 +315,6 @@ const Form = () => {
           ))}
         </motion.div>
 
-        {/* Numeric Input for L */}
         <motion.div
           className="grid grid-cols-1 sm:grid-cols-3 gap-8"
           initial="hidden"
@@ -365,7 +339,7 @@ const Form = () => {
               htmlFor="input3"
               className="block text-base font-medium text-gray-800 mb-2 group-hover:text-indigo-600 transition-colors"
             >
-              Lengh_in_mm (Number):
+              Length_in_mm (Number):
             </label>
             <input
               type="number"
@@ -377,7 +351,6 @@ const Form = () => {
             />
           </motion.div>
 
-          {/* Suffix Input */}
           <motion.div
             variants={{
               hidden: { opacity: 0, y: 20 },
@@ -401,7 +374,6 @@ const Form = () => {
           </motion.div>
         </motion.div>
 
-        {/* Submit Button */}
         <div className="flex flex-row gap-4 justify-center">
           <motion.div className="text-center">
             <motion.button
@@ -426,16 +398,13 @@ const Form = () => {
         </div>
       </form>
 
-      {/* Result Display */}
       <motion.div
         className="mt-10 p-6 bg-indigo-50 border border-indigo-200 rounded-lg shadow-lg"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
       >
-        <h2 className="text-2xl font-semibold text-indigo-700 mb-4">
-          SKU CODE
-        </h2>
+        <h2 className="text-2xl font-semibold text-indigo-700 mb-4">SKU CODE</h2>
         <pre className="text-lg text-gray-800 whitespace-pre-wrap">
           {result}
         </pre>
