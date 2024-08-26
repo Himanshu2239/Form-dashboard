@@ -92,14 +92,19 @@ const PipeForm = () => {
   // Function to process numeric values for Lengh_in_mm
   const processNumericValue = (value) => {
     if (value && !isNaN(value)) {
-      const numericValue = parseFloat(value);
-      const quotient = Math.floor(numericValue / 25);
-
-      // Ensure the result is a 3-digit string, padded with zeros if necessary
-      return quotient.toString().padStart(3, "0");
+      const numericValue = Math.floor(parseFloat(value) / 10);
+      return numericValue.toString().padStart(3, "0"); // Ensure 3 digits
     } else {
       return "000"; // Default value if input is invalid
     }
+  };
+
+  // Function to process Suffix input
+  const processSuffixValue = (value) => {
+    if (value) {
+      return value.substring(0, 3).padStart(3, "0").toUpperCase();
+    }
+    return "000"; // Default to "000" if no input
   };
 
   // Handle form submission
@@ -109,19 +114,19 @@ const PipeForm = () => {
     // Process Lengh_in_mm input
     const Lengh_in_mmValue = processNumericValue(formValues.Lengh_in_mm);
 
-    // Process the suffix to only take the first 2 characters
-    const suffixValue = formValues.Suffix.substring(0, 2).toUpperCase() || "00";
+    // Process Suffix
+    const suffixValue = processSuffixValue(formValues.Suffix);
 
-    // Generate the barcode string in the specified order, defaulting to "00" if no value is selected
+    // Generate the barcode string in the specified order with default values
     const resultString = [
-      dropdownMaps.Flanged[formValues.Flanged] || "00",
-      dropdownMaps.Joint[formValues.Joint] || "00",
-      dropdownMaps.Puddle[formValues.Puddle] || "00",
-      dropdownMaps.Necks[formValues.Necks] || "00",
-      dropdownMaps.DIA_in_mm[formValues.DIA_in_mm] || "00",
-      Lengh_in_mmValue || "000", // Using the updated 3-digit length format
-      dropdownMaps.PN_Value[formValues.PN_Value] || "00",
-      suffixValue,
+      dropdownMaps.Flanged[formValues.Flanged] || "00",  // Flanged default to "00"
+      dropdownMaps.Joint[formValues.Joint] || "0",       // Joint default to "0"
+      dropdownMaps.Puddle[formValues.Puddle] || "0",     // Puddle default to "0"
+      dropdownMaps.Necks[formValues.Necks] || "00",      // Necks default to "00"
+      dropdownMaps.DIA_in_mm[formValues.DIA_in_mm] || "00", // DIA_in_mm default to "00"
+      Lengh_in_mmValue || "000",                         // Length formatted to 3 digits
+      dropdownMaps.PN_Value[formValues.PN_Value] || "0", // PN_Value default to "0"
+      suffixValue,                                       // Suffix formatted to 3 characters
     ].join("");
 
     setResult(resultString);
