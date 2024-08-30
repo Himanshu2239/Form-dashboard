@@ -84,7 +84,7 @@ const Form = () => {
       "WELDABLE FLANGE LN": "WFL",
       "WELDABLE FLANGE SN": "WFS",
       "DOUBLE FLANGED INV TEE": "DFI",
-      "DF SKT BRANCH TEE": "DST"
+      "DF SKT BRANCH TEE": "DST",
     },
     Quality: {
       K7: "A",
@@ -124,6 +124,7 @@ const Form = () => {
       1600: "16",
     },
     "Branch Dia(mm)": {
+      50: "Y5",
       80: "Y8",
       100: "10",
       125: "12",
